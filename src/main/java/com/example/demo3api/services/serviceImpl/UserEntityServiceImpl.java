@@ -29,23 +29,5 @@ public class UserEntityServiceImpl implements UserEntityService {
         return DTOMapper.entityToResponse(entityFromTheDB);
     }
 
-    @Override
-    public UserResponse updateUser(String email, Long id) {
-        return null;
-    }
 
-    @Override
-    public List<UserResponse> getUsers() {
-        return null;
-    }
-
-    @Override
-    public UserResponse getUserByID(Long id) {
-        return null;
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-
-    }
 }
