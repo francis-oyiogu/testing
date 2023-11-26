@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,11 @@ public class UserEntityServiceImpl implements UserEntityService {
         UserEntity entity = DTOMapper.requestToEntity(request);
         UserEntity entityFromTheDB = userRepository.save(entity);
         return DTOMapper.entityToResponse(entityFromTheDB);
+    }
+
+    @Override
+    public List<UserResponse> getUsers(){
+        return userRepository.findAll().stream().map(DTOMapper::entityToResponse).collect(Collectors.toList());
     }
 
 

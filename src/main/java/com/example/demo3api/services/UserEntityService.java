@@ -8,5 +8,6 @@ import java.util.List;
 public interface UserEntityService {
 
     UserResponse createUser(UserRequest request);
+    List<UserResponse> getUsers();
 
 }
