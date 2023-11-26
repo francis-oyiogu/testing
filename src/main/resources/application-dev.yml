@@ -1,0 +1,20 @@
+spring:
+  datasource:
+#    url: jdbc:postgresql://localhost:5432/depp
+    url: jdbc:postgresql://lucky.db.elephantsql.com:5432/lxhnetzj
+    username: lxhnetzj
+    password: WNcyCh1iOnprAxQZiJFZErNvg9_BzO42
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+        jdbc:
+          time_zone: UTC+1
+
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+server:
+  port: 8090
