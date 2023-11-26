@@ -19,8 +19,8 @@
 #
 ## syntax=docker/dockerfile:1
 
-#FROM gcr.io/distroless/java17-debian11
-FROM eclipse-temurin:17
+FROM gcr.io/distroless/java17-debian11
+#FROM eclipse-temurin:17
 
 MAINTAINER Francis "Francis"
 
