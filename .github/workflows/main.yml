@@ -5,8 +5,20 @@ on:
     branches:
       - main
 
+env:
+  IMAGE_TAG: latest
+  JAVA_VERSION: 17
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  REPO_NAME: ${{ github.event.repository.name }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ECR_REPO: gcp-depp
+
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: 'ubuntu-latest'
 
     steps:
@@ -35,31 +47,43 @@ jobs:
           mvn clean
           mvn -B package -DskipTests=true --file pom.xml
 
-      - name: Build and push Docker image to ECR
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ECR_REPO: gcp-depp
-          IMAGE_TAG: latest
-        run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG .
-          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: $DOCKER_USERNAME
+          password: $DOCKERHUB_TOKEN
 
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v3
-#        with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#
-#      - name: Push to Docker Hub
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          dockerfile: Dockerfile
-#          push: true
-#          tags: ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          dockerfile: Dockerfile
+          push: true
+          tags: $DOCKER_USERNAME/gcpdepp:$IMAGE_TAG
 #          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
 
+#      - name: Build and push Docker image to ECR
+#        env:
+#          AWS_REGION: ${{ secrets.AWS_REGION }}
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          ECR_REPO: gcp-depp
+#          IMAGE_TAG: latest
+#        run: |
+#          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+#          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG .
+#          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
+
+  deploy:
+    needs: build
+    runs-on: [aws-ec2]
+    steps:
+      - name: Pull Image From DockerHub
+        run: docker pull $DOCKER_USERNAME/gcpdepp:$IMAGE_TAG
+
+      - name: Remove Old Container
+        run: docker rm -f depp-app
+
+      - name: Run Docker Container
+        run: docker run -d -p 8090:8090 --name depp-app $DOCKER_USERNAME/gcpdepp:$IMAGE_TAG
