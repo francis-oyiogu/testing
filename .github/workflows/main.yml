@@ -66,13 +66,45 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: aws-ec2
     steps:
       - name: Pull Image From DockerHub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+        uses: docker/pull-action@v2
+#        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/gcpdepp
+          tag: latest
 
       - name: Remove Old Container
-        run: docker rm -f depp-app
+#        run: docker rm -f depp-app
+        uses: docker/cli@v2
+        with:
+          command: container rm -f depp-app || true
 
       - name: Run Docker Container
-        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+#        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+        uses: docker/cli@v2
+        with:
+          command: container run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+
+
+#steps:
+#      - name: Pull Docker image
+#        uses: docker/pull-action@v2
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#          repository: your-image-name
+#          tag: latest
+#
+#      - name: Remove old container if exists
+#        uses: docker/cli@v2
+#        with:
+#          command: container rm -f depp-app || true
+#
+#      - name: Run Docker Container
+#        uses: docker/cli@v2
+#        with:
+#          command: container run -d -p 8090:8090 --name depp-app your-image-name:latest
