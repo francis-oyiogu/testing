@@ -61,7 +61,7 @@ jobs:
         run: docker rm -f depp-app || true
 
       - name: Run Docker Container
-        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+        run: docker run -d -p 8090:8090 --name depp-app "${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest"
 
 
 #--------------------------------------------------------------------
