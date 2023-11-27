@@ -1,7 +1,6 @@
 spring:
   datasource:
-#    url: jdbc:postgresql://localhost:5432/depp
-    url: jdbc:postgresql://lucky.db.elephantsql.com:5432/lxhnetzj
+    url: ${JDBC_URL}
     username: lxhnetzj
     password: WNcyCh1iOnprAxQZiJFZErNvg9_BzO42
 
