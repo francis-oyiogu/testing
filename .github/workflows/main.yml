@@ -41,28 +41,29 @@ jobs:
 
 
   deploy:
-    needs: build
     runs-on: another
+    needs: build
     container:
       image: ubuntu:latest
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-buildx-action@v3
 
       - name: Install Docker
         run: sudo snap install docker
 
       - name: Pull Image From DockerHub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
+          docker rm -f depp-app
+          docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
 
-      - name: Remove Old Container
-        run: docker rm -f depp-app
-
-      - name: Run Docker Container
-        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+#      - name: Remove Old Container
+#        run: docker rm -f depp-app
+#
+#      - name: Run Docker Container
+#        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
 
 
 #--------------------------------------------------------------------
