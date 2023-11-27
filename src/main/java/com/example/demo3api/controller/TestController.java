@@ -18,6 +18,6 @@ public class TestController {
 
     @GetMapping
     public String health(){
-        return "API is running";
+        return "API is running!!!!";
     }
 }
