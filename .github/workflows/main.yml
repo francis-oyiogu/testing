@@ -43,6 +43,8 @@ jobs:
   deploy:
     needs: build
     runs-on: [self-hosted]
+    container:
+      image: ubuntu:latest
     steps:
       - name: Pull Image From DockerHub
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
