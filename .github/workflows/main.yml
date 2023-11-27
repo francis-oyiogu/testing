@@ -44,18 +44,17 @@ jobs:
     runs-on: another
     needs: build
     steps:
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull Image From DockerHub
-        run: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
-          docker rm -f depp-app
-          docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
 
-#      - name: Remove Old Container
-#        run: docker rm -f depp-app
-#
-#      - name: Run Docker Container
-#        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
+      - name: Remove Old Container
+        run: docker rm -f depp-app || true
+
+      - name: Run Docker Container
+        run: docker run -d -p 8090:8090 --name depp-app ${{ secrets.DOCKER_USERNAME }}/gcpdepp:$latest
 
 
 #--------------------------------------------------------------------
