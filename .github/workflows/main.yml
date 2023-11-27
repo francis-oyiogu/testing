@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: self-hosted
     steps:
       - name: Pull Image From DockerHub
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
