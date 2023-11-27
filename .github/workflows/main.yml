@@ -50,7 +50,7 @@ jobs:
 #        uses: actions/checkout@v3
 
       - name: Install Docker
-        uses: brew install docker
+        run: brew install docker
 
       - name: Pull Image From DockerHub
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/gcpdepp:latest
