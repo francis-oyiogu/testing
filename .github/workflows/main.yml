@@ -46,6 +46,8 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
+      - name: Set up permissions for Docker socket
+        run: sudo chmod 666 /var/run/docker.sock
 
       - name: Pull Docker image
         run: |
